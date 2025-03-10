@@ -1,4 +1,4 @@
-package http
+package server_test
 
 import (
 	"net/http"
@@ -6,6 +6,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	server "github.com/atcheri/player-server-web-app-tdd-go/internal/infrastructure/http"
 )
 
 func TestGETPlayer(t *testing.T) {
@@ -15,7 +17,7 @@ func TestGETPlayer(t *testing.T) {
 		response := httptest.NewRecorder()
 
 		// act
-		PlayerServer(response, request)
+		server.PlayerServer(response, request)
 		got := response.Body.String()
 		want := "20"
 
