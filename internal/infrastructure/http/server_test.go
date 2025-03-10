@@ -10,14 +10,30 @@ import (
 	server "github.com/atcheri/player-server-web-app-tdd-go/internal/infrastructure/http"
 )
 
+type StubPlayerStore struct {
+	scores map[string]int
+}
+
+func (s *StubPlayerStore) GetPlayerScore(name string) int {
+	score := s.scores[name]
+	return score
+}
+
 func TestGETPlayer(t *testing.T) {
 	t.Run("returns Pepper's score", func(t *testing.T) {
 		// arrange
+		store := StubPlayerStore{
+			map[string]int{
+				"Pepper": 20,
+				"Floyd":  10,
+			},
+		}
+		srv := &server.PlayerServer{&store}
 		request, _ := http.NewRequest(http.MethodGet, "/players/Pepper", nil)
 		response := httptest.NewRecorder()
 
 		// act
-		server.PlayerServer(response, request)
+		srv.ServeHTTP(response, request)
 		got := response.Body.String()
 		want := "20"
 
@@ -27,11 +43,18 @@ func TestGETPlayer(t *testing.T) {
 
 	t.Run("returns Floyd's score", func(t *testing.T) {
 		// arrange
+		store := StubPlayerStore{
+			map[string]int{
+				"Pepper": 20,
+				"Floyd":  10,
+			},
+		}
+		srv := &server.PlayerServer{&store}
 		request, _ := http.NewRequest(http.MethodGet, "/players/Floyd", nil)
 		response := httptest.NewRecorder()
 
 		// act
-		server.PlayerServer(response, request)
+		srv.ServeHTTP(response, request)
 		got := response.Body.String()
 		want := "10"
 

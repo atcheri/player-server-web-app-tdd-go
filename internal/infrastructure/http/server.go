@@ -4,23 +4,17 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+
+	player "github.com/atcheri/player-server-web-app-tdd-go/internal/domain/player"
 )
 
-func PlayerServer(w http.ResponseWriter, r *http.Request) {
-	player := strings.TrimPrefix(r.URL.Path, "/players/")
-
-	score := GetPlayerScore(player)
-	fmt.Fprint(w, score)
+type PlayerServer struct {
+	Store player.PlayerStore
 }
 
-func GetPlayerScore(player string) string {
-	if player == "Pepper" {
-		return "20"
-	}
+func (p *PlayerServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	player := strings.TrimPrefix(r.URL.Path, "/players/")
 
-	if player == "Floyd" {
-		return "10"
-	}
-
-	return ""
+	score := p.Store.GetPlayerScore(player)
+	fmt.Fprint(w, score)
 }
