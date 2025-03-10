@@ -24,4 +24,18 @@ func TestGETPlayer(t *testing.T) {
 		// assert
 		assert.Equal(t, want, got)
 	})
+
+	t.Run("returns Floyd's score", func(t *testing.T) {
+		// arrange
+		request, _ := http.NewRequest(http.MethodGet, "/players/Floyd", nil)
+		response := httptest.NewRecorder()
+
+		// act
+		server.PlayerServer(response, request)
+		got := response.Body.String()
+		want := "10"
+
+		// assert
+		assert.Equal(t, want, got)
+	})
 }
