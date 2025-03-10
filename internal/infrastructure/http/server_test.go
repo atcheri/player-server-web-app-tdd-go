@@ -61,4 +61,25 @@ func TestGETPlayer(t *testing.T) {
 		// assert
 		assert.Equal(t, want, got)
 	})
+
+	t.Run("returns 404 no missing player", func(t *testing.T) {
+		// arrange
+		store := StubPlayerStore{
+			map[string]int{
+				"Pepper": 20,
+				"Floyd":  10,
+			},
+		}
+		srv := &server.PlayerServer{&store}
+		request, _ := http.NewRequest(http.MethodGet, "/players/NoOne", nil)
+		response := httptest.NewRecorder()
+
+		// act
+		srv.ServeHTTP(response, request)
+		got := response.Code
+		want := http.StatusNotFound
+
+		// assert
+		assert.Equal(t, want, got)
+	})
 }
