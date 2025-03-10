@@ -97,7 +97,7 @@ func TestGETPlayer(t *testing.T) {
 }
 
 func TestStorePlayerWins(t *testing.T) {
-	t.Run("returns status accepted on POST request", func(*testing.T) {
+	t.Run("records win on POST request", func(*testing.T) {
 		// arrange
 		store := StubPlayerStore{
 			map[string]int{},
@@ -113,5 +113,7 @@ func TestStorePlayerWins(t *testing.T) {
 
 		// assert
 		assert.Equal(t, http.StatusAccepted, status)
+		assert.Len(t, store.scores, 1)
+		assert.Equal(t, "Pepper", store.winCalls[0])
 	})
 }
