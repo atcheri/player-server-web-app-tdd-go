@@ -34,11 +34,13 @@ func TestGETPlayer(t *testing.T) {
 
 		// act
 		srv.ServeHTTP(response, request)
-		got := response.Body.String()
-		want := "20"
+		score := response.Body.String()
+		expectedScore := "20"
+		status := response.Code
 
 		// assert
-		assert.Equal(t, want, got)
+		assert.Equal(t, expectedScore, score)
+		assert.Equal(t, http.StatusOK, status)
 	})
 
 	t.Run("returns Floyd's score", func(t *testing.T) {
@@ -55,11 +57,13 @@ func TestGETPlayer(t *testing.T) {
 
 		// act
 		srv.ServeHTTP(response, request)
-		got := response.Body.String()
-		want := "10"
+		score := response.Body.String()
+		expectedScore := "10"
+		status := response.Code
 
 		// assert
-		assert.Equal(t, want, got)
+		assert.Equal(t, expectedScore, score)
+		assert.Equal(t, http.StatusOK, status)
 	})
 
 	t.Run("returns 404 no missing player", func(t *testing.T) {
@@ -76,10 +80,9 @@ func TestGETPlayer(t *testing.T) {
 
 		// act
 		srv.ServeHTTP(response, request)
-		got := response.Code
-		want := http.StatusNotFound
+		status := response.Code
 
 		// assert
-		assert.Equal(t, want, got)
+		assert.Equal(t, http.StatusNotFound, status)
 	})
 }
