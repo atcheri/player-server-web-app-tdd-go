@@ -19,10 +19,10 @@ func (p *PlayerServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		p.showPlayerScore(w, r)
 	}
-
 }
 
 func (p *PlayerServer) processPlayerWins(w http.ResponseWriter, r *http.Request) {
+	_ = p.Store.RecordWin("Bob")
 	w.WriteHeader(http.StatusAccepted)
 
 }
