@@ -12,7 +12,7 @@ import (
 
 func TestRecordWinsAndRetrievePlayerScore(t *testing.T) {
 	// arrange
-	store := memorystore.InMemoryPlayerStore{}
+	store := memorystore.NewInMemoryPlayerStore()
 	server := server.PlayerServer{&store}
 
 	// act
