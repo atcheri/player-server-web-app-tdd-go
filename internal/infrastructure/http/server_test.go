@@ -32,6 +32,7 @@ func TestGETPlayer(t *testing.T) {
 				"Pepper": 20,
 				"Floyd":  10,
 			},
+			nil,
 		}
 		srv := &server.PlayerServer{&store}
 		request, _ := http.NewRequest(http.MethodGet, "/players/Pepper", nil)
@@ -55,6 +56,7 @@ func TestGETPlayer(t *testing.T) {
 				"Pepper": 20,
 				"Floyd":  10,
 			},
+			nil,
 		}
 		srv := &server.PlayerServer{&store}
 		request, _ := http.NewRequest(http.MethodGet, "/players/Floyd", nil)
@@ -78,6 +80,7 @@ func TestGETPlayer(t *testing.T) {
 				"Pepper": 20,
 				"Floyd":  10,
 			},
+			nil,
 		}
 		srv := &server.PlayerServer{&store}
 		request, _ := http.NewRequest(http.MethodGet, "/players/NoOne", nil)
@@ -97,6 +100,7 @@ func TestStorePlayerWins(t *testing.T) {
 		// arrange
 		store := StubPlayerStore{
 			map[string]int{},
+			nil,
 		}
 		srv := &server.PlayerServer{&store}
 		request, _ := http.NewRequest(http.MethodPost, "/players/Pepper", nil)
