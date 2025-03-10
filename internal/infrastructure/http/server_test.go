@@ -113,7 +113,7 @@ func TestStorePlayerWins(t *testing.T) {
 
 		// assert
 		assert.Equal(t, http.StatusAccepted, status)
-		assert.Len(t, store.scores, 1)
+		assert.Equal(t, 1, len(store.winCalls))
 		assert.Equal(t, "Pepper", store.winCalls[0])
 	})
 }

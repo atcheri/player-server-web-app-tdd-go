@@ -22,14 +22,14 @@ func (p *PlayerServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (p *PlayerServer) processPlayerWins(w http.ResponseWriter, r *http.Request) {
-	_ = p.Store.RecordWin("Bob")
+	player := strings.TrimPrefix(r.URL.Path, "/players/")
+	_ = p.Store.RecordWin(player)
 	w.WriteHeader(http.StatusAccepted)
 
 }
 
 func (p *PlayerServer) showPlayerScore(w http.ResponseWriter, r *http.Request) {
 	player := strings.TrimPrefix(r.URL.Path, "/players/")
-
 	score := p.Store.GetPlayerScore(player)
 	if score == 0 {
 		w.WriteHeader(http.StatusNotFound)
