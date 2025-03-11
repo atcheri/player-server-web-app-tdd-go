@@ -8,7 +8,7 @@ import (
 )
 
 type FileSystemPlayerStore struct {
-	Database io.ReadSeeker
+	Database io.ReadWriteSeeker
 }
 
 func (f FileSystemPlayerStore) GetPlayerScore(name string) int {
