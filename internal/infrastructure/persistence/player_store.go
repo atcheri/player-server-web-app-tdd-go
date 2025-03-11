@@ -1,6 +1,10 @@
 package memorystore
 
-import "sync"
+import (
+	"sync"
+
+	"github.com/atcheri/player-server-web-app-tdd-go/internal/domain/player"
+)
 
 type InMemoryPlayerStore struct {
 	score map[string]int
@@ -22,5 +26,9 @@ func (s *InMemoryPlayerStore) RecordWin(name string) error {
 	defer s.mu.Unlock()
 
 	s.score[name]++
+	return nil
+}
+
+func (i *InMemoryPlayerStore) GetLeague() []player.Player {
 	return nil
 }

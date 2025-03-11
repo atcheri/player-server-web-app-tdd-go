@@ -33,12 +33,8 @@ func (p *PlayerServer) handleLeague(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func (p *PlayerServer) getLeagueTable() any {
-	table := []player.Player{
-		{Name: "Chris", Wins: 20},
-	}
-
-	return table
+func (p *PlayerServer) getLeagueTable() []player.Player {
+	return p.Store.GetLeague()
 }
 
 func (p *PlayerServer) handlePlayer(w http.ResponseWriter, r *http.Request) {
