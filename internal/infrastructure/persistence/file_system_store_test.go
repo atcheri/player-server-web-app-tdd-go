@@ -31,4 +31,20 @@ func TestFileSystemStore(t *testing.T) {
 		// reading again the league
 		assert.Equal(t, expectedLeague, store.GetLeague())
 	})
+
+	t.Run("get player score", func(t *testing.T) {
+		// arrange
+		database := strings.NewReader(`[
+			{"Name": "Cleo", "Wins": 10},
+			{"Name": "Chris", "Wins": 33}]`)
+
+		store := filestore.FileSystemPlayerStore{database}
+
+		// act
+		score := store.GetPlayerScore("Chris")
+
+		// assert
+		assert.Equal(t, 33, score)
+
+	})
 }
