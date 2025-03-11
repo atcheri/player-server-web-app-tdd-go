@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
@@ -27,6 +28,12 @@ func NewPlayerServer(store player.PlayerStore) *PlayerServer {
 }
 
 func (p *PlayerServer) handleLeague(w http.ResponseWriter, r *http.Request) {
+	leagueTable := []player.Player{
+		{Name: "Chris", Wins: 20},
+	}
+
+	json.NewEncoder(w).Encode(leagueTable)
+
 	w.WriteHeader(http.StatusOK)
 }
 
