@@ -1,12 +1,14 @@
 package server_test
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/atcheri/player-server-web-app-tdd-go/internal/domain/player"
 	server "github.com/atcheri/player-server-web-app-tdd-go/internal/infrastructure/http"
 )
 
@@ -129,8 +131,11 @@ func TestLeague(t *testing.T) {
 		// act
 		srv.ServeHTTP(response, request)
 		status := response.Code
+		var playerJson []player.Player
+		err := json.NewDecoder(response.Body).Decode(&playerJson)
 
 		// assert
 		assert.Equal(t, http.StatusOK, status)
+		assert.Nil(t, err)
 	})
 }
