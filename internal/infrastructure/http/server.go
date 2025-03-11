@@ -9,6 +9,8 @@ import (
 	player "github.com/atcheri/player-server-web-app-tdd-go/internal/domain/player"
 )
 
+const jsonContentType = "application/json"
+
 type PlayerServer struct {
 	Store player.PlayerStore
 	http.Handler
@@ -28,7 +30,7 @@ func NewPlayerServer(store player.PlayerStore) *PlayerServer {
 }
 
 func (p *PlayerServer) handleLeague(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("content-type", "application/json")
+	w.Header().Set("content-type", jsonContentType)
 	leagueTable := p.getLeagueTable()
 	json.NewEncoder(w).Encode(leagueTable)
 	w.WriteHeader(http.StatusOK)

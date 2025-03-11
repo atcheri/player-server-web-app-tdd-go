@@ -30,5 +30,11 @@ func (s *InMemoryPlayerStore) RecordWin(name string) error {
 }
 
 func (i *InMemoryPlayerStore) GetLeague() []player.Player {
-	return nil
+	var league []player.Player
+
+	for name, wins := range i.score {
+		league = append(league, player.Player{Name: name, Wins: wins})
+	}
+
+	return league
 }
