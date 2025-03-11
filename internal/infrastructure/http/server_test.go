@@ -15,6 +15,7 @@ import (
 type StubPlayerStore struct {
 	scores   map[string]int
 	winCalls []string
+	league   []player.Player
 }
 
 func (s *StubPlayerStore) GetPlayerScore(name string) int {
@@ -27,6 +28,10 @@ func (s *StubPlayerStore) RecordWin(name string) error {
 	return nil
 }
 
+func (s *StubPlayerStore) GetLeague() []player.Player {
+	return s.league
+}
+
 func TestGETPlayer(t *testing.T) {
 	t.Run("returns Pepper's score", func(t *testing.T) {
 		// arrange
@@ -35,7 +40,7 @@ func TestGETPlayer(t *testing.T) {
 				"Pepper": 20,
 				"Floyd":  10,
 			},
-			nil,
+			nil, nil,
 		}
 		srv := server.NewPlayerServer(&store)
 		request, _ := http.NewRequest(http.MethodGet, "/players/Pepper", nil)
@@ -59,7 +64,7 @@ func TestGETPlayer(t *testing.T) {
 				"Pepper": 20,
 				"Floyd":  10,
 			},
-			nil,
+			nil, nil,
 		}
 		srv := server.NewPlayerServer(&store)
 		request, _ := http.NewRequest(http.MethodGet, "/players/Floyd", nil)
@@ -83,7 +88,7 @@ func TestGETPlayer(t *testing.T) {
 				"Pepper": 20,
 				"Floyd":  10,
 			},
-			nil,
+			nil, nil,
 		}
 		srv := server.NewPlayerServer(&store)
 		request, _ := http.NewRequest(http.MethodGet, "/players/NoOne", nil)
@@ -103,7 +108,7 @@ func TestStorePlayerWins(t *testing.T) {
 		// arrange
 		store := StubPlayerStore{
 			map[string]int{},
-			nil,
+			nil, nil,
 		}
 		srv := server.NewPlayerServer(&store)
 		request, _ := http.NewRequest(http.MethodPost, "/players/Pepper", nil)
@@ -124,12 +129,12 @@ func TestLeague(t *testing.T) {
 	t.Run("returns 200 on /league", func(t *testing.T) {
 		// arrange
 		players := []player.Player{
-			{"Cleo", 32},
-			{"Chris", 20},
-			{"Tiest", 14},
+			{Name: "Cleo", Wins: 32},
+			{Name: "Chris", Wins: 20},
+			{Name: "Tiest", Wins: 14},
 		}
 
-		store := StubPlayerStore{}
+		store := StubPlayerStore{nil, nil, players}
 		srv := server.NewPlayerServer(&store)
 		request, _ := http.NewRequest(http.MethodPost, "/league", nil)
 		response := httptest.NewRecorder()
