@@ -9,16 +9,23 @@ import (
 )
 
 type PlayerServer struct {
-	Store player.PlayerStore
+	Store  player.PlayerStore
+	router *http.ServeMux
+}
+
+func NewPlayerServer(store player.PlayerStore) *PlayerServer {
+	server := &PlayerServer{
+		store, http.NewServeMux(),
+	}
+
+	server.router.Handle("/league", http.HandlerFunc(server.handleLeague))
+	server.router.Handle("/players/", http.HandlerFunc(server.handlePlayer))
+
+	return server
 }
 
 func (p *PlayerServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	router := http.NewServeMux()
-
-	router.Handle("/league", http.HandlerFunc(p.handleLeague))
-	router.Handle("/players/", http.HandlerFunc(p.handlePlayer))
-
-	router.ServeHTTP(w, r)
+	p.router.ServeHTTP(w, r)
 }
 
 func (p *PlayerServer) handleLeague(w http.ResponseWriter, r *http.Request) {

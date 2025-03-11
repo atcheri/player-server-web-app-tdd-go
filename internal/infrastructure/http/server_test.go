@@ -35,7 +35,7 @@ func TestGETPlayer(t *testing.T) {
 			},
 			nil,
 		}
-		srv := &server.PlayerServer{&store}
+		srv := server.NewPlayerServer(&store)
 		request, _ := http.NewRequest(http.MethodGet, "/players/Pepper", nil)
 		response := httptest.NewRecorder()
 
@@ -59,7 +59,7 @@ func TestGETPlayer(t *testing.T) {
 			},
 			nil,
 		}
-		srv := &server.PlayerServer{&store}
+		srv := server.NewPlayerServer(&store)
 		request, _ := http.NewRequest(http.MethodGet, "/players/Floyd", nil)
 		response := httptest.NewRecorder()
 
@@ -83,7 +83,7 @@ func TestGETPlayer(t *testing.T) {
 			},
 			nil,
 		}
-		srv := &server.PlayerServer{&store}
+		srv := server.NewPlayerServer(&store)
 		request, _ := http.NewRequest(http.MethodGet, "/players/NoOne", nil)
 		response := httptest.NewRecorder()
 
@@ -103,7 +103,7 @@ func TestStorePlayerWins(t *testing.T) {
 			map[string]int{},
 			nil,
 		}
-		srv := &server.PlayerServer{&store}
+		srv := server.NewPlayerServer(&store)
 		request, _ := http.NewRequest(http.MethodPost, "/players/Pepper", nil)
 		response := httptest.NewRecorder()
 
@@ -122,7 +122,7 @@ func TestLeague(t *testing.T) {
 	t.Run("returns 200 on /league", func(t *testing.T) {
 		// arrange
 		store := StubPlayerStore{}
-		srv := &server.PlayerServer{&store}
+		srv := server.NewPlayerServer(&store)
 		request, _ := http.NewRequest(http.MethodPost, "/league", nil)
 		response := httptest.NewRecorder()
 

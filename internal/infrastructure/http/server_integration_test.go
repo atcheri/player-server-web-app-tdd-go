@@ -13,7 +13,7 @@ import (
 func TestRecordWinsAndRetrievePlayerScore(t *testing.T) {
 	// arrange
 	store := memorystore.NewInMemoryPlayerStore()
-	server := server.PlayerServer{&store}
+	server := server.NewPlayerServer(&store)
 
 	// act
 	postRequest, _ := http.NewRequest(http.MethodPost, "/players/Pepper", nil)
