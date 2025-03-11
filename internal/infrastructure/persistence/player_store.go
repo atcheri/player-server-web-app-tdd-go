@@ -1,4 +1,4 @@
-package memorystore
+package persistence
 
 import (
 	"sync"
