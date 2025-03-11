@@ -6,6 +6,8 @@ import (
 
 	"github.com/atcheri/player-server-web-app-tdd-go/internal/domain/player"
 	"github.com/stretchr/testify/assert"
+
+	filestore "github.com/atcheri/player-server-web-app-tdd-go/internal/infrastructure/persistence"
 )
 
 func TestFileSystemStore(t *testing.T) {
@@ -22,10 +24,9 @@ func TestFileSystemStore(t *testing.T) {
 		store := filestore.FileSystemPlayerStore{database}
 
 		// act
-		league := store.getLeague()
+		league := store.GetLeague()
 
 		// assert
 		assert.Equal(t, expectedLeague, league)
-
 	})
 }
