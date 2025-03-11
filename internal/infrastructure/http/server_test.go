@@ -117,3 +117,20 @@ func TestStorePlayerWins(t *testing.T) {
 		assert.Equal(t, "Pepper", store.winCalls[0])
 	})
 }
+
+func TestLeague(t *testing.T) {
+	t.Run("returns 200 on /league", func(t *testing.T) {
+		// arrange
+		store := StubPlayerStore{}
+		srv := &server.PlayerServer{&store}
+		request, _ := http.NewRequest(http.MethodPost, "/league", nil)
+		response := httptest.NewRecorder()
+
+		// act
+		srv.ServeHTTP(response, request)
+		status := response.Code
+
+		// assert
+		assert.Equal(t, http.StatusOK, status)
+	})
+}
