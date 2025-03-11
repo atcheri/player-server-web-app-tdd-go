@@ -147,6 +147,7 @@ func TestLeague(t *testing.T) {
 
 		// assert
 		assert.Equal(t, http.StatusOK, status)
+		assert.Equal(t, "application/json", response.Result().Header.Get("content-type"))
 		assert.Nil(t, err)
 		assert.Equal(t, players, playerJson)
 	})
