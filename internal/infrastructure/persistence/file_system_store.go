@@ -8,10 +8,11 @@ import (
 )
 
 type FileSystemPlayerStore struct {
-	Database io.Reader
+	Database io.ReadSeeker
 }
 
 func (f *FileSystemPlayerStore) GetLeague() []player.Player {
+	f.Database.Seek(0, io.SeekStart)
 	league, _ := league.NewLeague(f.Database)
 	return league
 }

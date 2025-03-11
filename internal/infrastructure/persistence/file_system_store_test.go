@@ -28,5 +28,7 @@ func TestFileSystemStore(t *testing.T) {
 
 		// assert
 		assert.Equal(t, expectedLeague, league)
+		// reading again the league
+		assert.Equal(t, expectedLeague, store.GetLeague())
 	})
 }
