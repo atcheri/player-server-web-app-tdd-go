@@ -123,6 +123,12 @@ func TestStorePlayerWins(t *testing.T) {
 func TestLeague(t *testing.T) {
 	t.Run("returns 200 on /league", func(t *testing.T) {
 		// arrange
+		players := []player.Player{
+			{"Cleo", 32},
+			{"Chris", 20},
+			{"Tiest", 14},
+		}
+
 		store := StubPlayerStore{}
 		srv := server.NewPlayerServer(&store)
 		request, _ := http.NewRequest(http.MethodPost, "/league", nil)
@@ -137,5 +143,6 @@ func TestLeague(t *testing.T) {
 		// assert
 		assert.Equal(t, http.StatusOK, status)
 		assert.Nil(t, err)
+		assert.Equal(t, players, playerJson)
 	})
 }
