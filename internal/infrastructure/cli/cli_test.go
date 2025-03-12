@@ -38,6 +38,12 @@ func TestCLI(t *testing.T) {
 	cli.PlayPoker()
 
 	// assert
-	assert.Equal(t, 1, len(playerStore.winCalls))
-	assert.Equal(t, "Chris", playerStore.winCalls[0])
+	assertPlayerWin(t, playerStore, "Chris")
+}
+
+func assertPlayerWin(t testing.TB, store *StubPlayerStore, winner string) {
+	t.Helper()
+
+	assert.Equal(t, 1, len(store.winCalls))
+	assert.Equal(t, "Chris", store.winCalls[0])
 }
