@@ -2,6 +2,7 @@ package persistence
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"os"
 
@@ -13,14 +14,18 @@ type FileSystemPlayerStore struct {
 	league   domain.League
 }
 
-func NewFileSystemPlayerStore(database *os.File) *FileSystemPlayerStore {
+func NewFileSystemPlayerStore(database *os.File) (*FileSystemPlayerStore, error) {
 	database.Seek(0, io.SeekStart)
-	league, _ := domain.NewLeague(database)
+	league, err := domain.NewLeague(database)
+
+	if err != nil {
+		return nil, fmt.Errorf("problem loading player store from file %s, %v", database.Name(), err)
+	}
 
 	return &FileSystemPlayerStore{
 		Database: json.NewEncoder(&Tape{database}),
 		league:   league,
-	}
+	}, nil
 }
 
 func (f *FileSystemPlayerStore) RecordWin(name string) {
