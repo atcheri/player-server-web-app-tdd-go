@@ -3,12 +3,21 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 
 	server "github.com/atcheri/player-server-web-app-tdd-go/internal/infrastructure/http"
-	memorystore "github.com/atcheri/player-server-web-app-tdd-go/internal/infrastructure/persistence"
+	"github.com/atcheri/player-server-web-app-tdd-go/internal/infrastructure/persistence"
 )
 
+const dbFileName = "game.db.json"
+
 func main() {
-	srv := server.NewPlayerServer(&memorystore.InMemoryPlayerStore{})
+	db, err := os.OpenFile(dbFileName, os.O_RDWR|os.O_CREATE, 0666)
+	if err != nil {
+		log.Fatalf("problem opening %s %v", dbFileName, err)
+	}
+
+	store := &persistence.FileSystemPlayerStore{Database: db}
+	srv := server.NewPlayerServer(store)
 	log.Fatal(http.ListenAndServe(":5000", srv))
 }

@@ -6,17 +6,17 @@ import (
 	"net/http"
 	"strings"
 
-	player "github.com/atcheri/player-server-web-app-tdd-go/internal/domain/player"
+	"github.com/atcheri/player-server-web-app-tdd-go/internal/domain"
 )
 
 const jsonContentType = "application/json"
 
 type PlayerServer struct {
-	Store player.PlayerStore
+	Store domain.PlayerStore
 	http.Handler
 }
 
-func NewPlayerServer(store player.PlayerStore) *PlayerServer {
+func NewPlayerServer(store domain.PlayerStore) *PlayerServer {
 	server := new(PlayerServer)
 
 	server.Store = store
@@ -36,7 +36,7 @@ func (p *PlayerServer) handleLeague(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func (p *PlayerServer) getLeagueTable() []player.Player {
+func (p *PlayerServer) getLeagueTable() domain.League {
 	return p.Store.GetLeague()
 }
 
@@ -51,7 +51,7 @@ func (p *PlayerServer) handlePlayer(w http.ResponseWriter, r *http.Request) {
 }
 
 func (p *PlayerServer) processPlayerWins(w http.ResponseWriter, player string) {
-	_ = p.Store.RecordWin(player)
+	p.Store.RecordWin(player)
 	w.WriteHeader(http.StatusAccepted)
 
 }

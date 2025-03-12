@@ -1,17 +1,15 @@
-package league
+package domain
 
 import (
 	"encoding/json"
 	"fmt"
 	"io"
-
-	"github.com/atcheri/player-server-web-app-tdd-go/internal/domain/player"
 )
 
-type League []player.Player
+type League []Player
 
 func NewLeague(reader io.Reader) (League, error) {
-	var league []player.Player
+	var league []Player
 	err := json.NewDecoder(reader).Decode(&league)
 	if err != nil {
 		err = fmt.Errorf("problem parsing league, %v", err)
@@ -20,7 +18,7 @@ func NewLeague(reader io.Reader) (League, error) {
 	return league, err
 }
 
-func (l League) Find(name string) *player.Player {
+func (l League) Find(name string) *Player {
 	for i, p := range l {
 		if p.Name == name {
 			return &l[i]

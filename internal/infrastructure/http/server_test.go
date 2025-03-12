@@ -8,14 +8,14 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/atcheri/player-server-web-app-tdd-go/internal/domain/player"
+	"github.com/atcheri/player-server-web-app-tdd-go/internal/domain"
 	server "github.com/atcheri/player-server-web-app-tdd-go/internal/infrastructure/http"
 )
 
 type StubPlayerStore struct {
 	scores   map[string]int
 	winCalls []string
-	league   []player.Player
+	league   []domain.Player
 }
 
 func (s *StubPlayerStore) GetPlayerScore(name string) int {
@@ -23,12 +23,11 @@ func (s *StubPlayerStore) GetPlayerScore(name string) int {
 	return score
 }
 
-func (s *StubPlayerStore) RecordWin(name string) error {
+func (s *StubPlayerStore) RecordWin(name string) {
 	s.winCalls = append(s.winCalls, name)
-	return nil
 }
 
-func (s *StubPlayerStore) GetLeague() []player.Player {
+func (s *StubPlayerStore) GetLeague() domain.League {
 	return s.league
 }
 
@@ -128,7 +127,7 @@ func TestStorePlayerWins(t *testing.T) {
 func TestLeague(t *testing.T) {
 	t.Run("returns 200 on /league", func(t *testing.T) {
 		// arrange
-		players := []player.Player{
+		players := []domain.Player{
 			{Name: "Cleo", Wins: 32},
 			{Name: "Chris", Wins: 20},
 			{Name: "Tiest", Wins: 14},
@@ -142,7 +141,7 @@ func TestLeague(t *testing.T) {
 		// act
 		srv.ServeHTTP(response, request)
 		status := response.Code
-		var playerJson []player.Player
+		var playerJson []domain.Player
 		err := json.NewDecoder(response.Body).Decode(&playerJson)
 
 		// assert

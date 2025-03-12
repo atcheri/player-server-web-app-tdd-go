@@ -3,7 +3,7 @@ package persistence
 import (
 	"sync"
 
-	"github.com/atcheri/player-server-web-app-tdd-go/internal/domain/player"
+	"github.com/atcheri/player-server-web-app-tdd-go/internal/domain"
 )
 
 type InMemoryPlayerStore struct {
@@ -21,19 +21,18 @@ func (s *InMemoryPlayerStore) GetPlayerScore(name string) int {
 	return s.score[name]
 }
 
-func (s *InMemoryPlayerStore) RecordWin(name string) error {
+func (s *InMemoryPlayerStore) RecordWin(name string) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	s.score[name]++
-	return nil
 }
 
-func (i *InMemoryPlayerStore) GetLeague() []player.Player {
-	var league []player.Player
+func (i *InMemoryPlayerStore) GetLeague() domain.League {
+	var league []domain.Player
 
 	for name, wins := range i.score {
-		league = append(league, player.Player{Name: name, Wins: wins})
+		league = append(league, domain.Player{Name: name, Wins: wins})
 	}
 
 	return league
