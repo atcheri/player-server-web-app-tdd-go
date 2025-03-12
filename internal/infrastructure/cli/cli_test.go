@@ -29,6 +29,8 @@ func (s *StubPlayerStore) GetLeague() domain.League {
 	return s.league
 }
 
+var dummySpyAlerter = &SpyBlindAlerter{}
+
 type SpyBlindAlerter struct {
 	alerts []struct {
 		scheduledAt time.Duration
@@ -48,7 +50,7 @@ func TestCLI(t *testing.T) {
 		// arrange
 		in := strings.NewReader("Chris wins\n")
 		playerStore := &StubPlayerStore{}
-		cli := poker.NewCLI(playerStore, in)
+		cli := poker.NewCLI(playerStore, in, dummySpyAlerter)
 
 		// act
 		cli.PlayPoker()
@@ -61,7 +63,7 @@ func TestCLI(t *testing.T) {
 		// arrange
 		in := strings.NewReader("Cleo wins\n")
 		playerStore := &StubPlayerStore{}
-		cli := poker.NewCLI(playerStore, in)
+		cli := poker.NewCLI(playerStore, in, dummySpyAlerter)
 
 		// act
 		cli.PlayPoker()
@@ -78,7 +80,7 @@ func TestCLI(t *testing.T) {
 		cli := poker.NewCLI(playerStore, in, blindAlerter)
 		cli.PlayPoker()
 
-		assert.Equal(t, 1, len(blindAlerter.alerts))
+		assert.Equal(t, 1, len(blindAlerter.alerts), "expected a blind alert to be scheduled")
 	})
 }
 

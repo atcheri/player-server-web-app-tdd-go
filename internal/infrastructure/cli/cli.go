@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"io"
 	"strings"
+	"time"
 
 	"github.com/atcheri/player-server-web-app-tdd-go/internal/domain"
 )
@@ -11,16 +12,19 @@ import (
 type CLI struct {
 	playerStore domain.PlayerStore
 	in          *bufio.Scanner
+	alerter     domain.BlindAlerter
 }
 
-func NewCLI(store domain.PlayerStore, in io.Reader) *CLI {
+func NewCLI(store domain.PlayerStore, in io.Reader, alerter domain.BlindAlerter) *CLI {
 	return &CLI{
 		playerStore: store,
 		in:          bufio.NewScanner(in),
+		alerter:     alerter,
 	}
 }
 
 func (cli *CLI) PlayPoker() {
+	cli.alerter.ScheduleAlertAt(5*time.Second, 100)
 	input := cli.readLine()
 	cli.playerStore.RecordWin(extractWinner(input))
 }
