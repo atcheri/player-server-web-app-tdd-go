@@ -33,7 +33,7 @@ func TestCLI(t *testing.T) {
 		// arrange
 		in := strings.NewReader("Chris wins\n")
 		playerStore := &StubPlayerStore{}
-		cli := &poker.CLI{playerStore, in}
+		cli := poker.NewCLI(playerStore, in)
 
 		// act
 		cli.PlayPoker()
@@ -46,7 +46,7 @@ func TestCLI(t *testing.T) {
 		// arrange
 		in := strings.NewReader("Cleo wins\n")
 		playerStore := &StubPlayerStore{}
-		cli := &poker.CLI{playerStore, in}
+		cli := poker.NewCLI(playerStore, in)
 
 		// act
 		cli.PlayPoker()
