@@ -2,27 +2,27 @@ package persistence
 
 import (
 	"encoding/json"
-	"errors"
 	"io"
 
 	"github.com/atcheri/player-server-web-app-tdd-go/internal/domain/league"
+	"github.com/atcheri/player-server-web-app-tdd-go/internal/domain/player"
 )
 
 type FileSystemPlayerStore struct {
 	Database io.ReadWriteSeeker
 }
 
-func (f FileSystemPlayerStore) RecordWin(name string) error {
+func (f FileSystemPlayerStore) RecordWin(name string) {
 	l := f.GetLeague()
-	player := l.Find(name)
-	if player == nil {
-		return errors.New("player not found. Could not update score")
+	p := l.Find(name)
+	if p != nil {
+		p.Wins++
+	} else {
+		l = append(l, player.Player{Name: "Pepper", Wins: 1})
 	}
 
-	player.Wins++
 	f.Database.Seek(0, io.SeekStart)
 	json.NewEncoder(f.Database).Encode(l)
-	return nil
 }
 
 func (f FileSystemPlayerStore) GetPlayerScore(name string) int {
