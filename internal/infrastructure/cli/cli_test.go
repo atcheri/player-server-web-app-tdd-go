@@ -29,21 +29,36 @@ func (s *StubPlayerStore) GetLeague() domain.League {
 }
 
 func TestCLI(t *testing.T) {
-	// arrange
-	in := strings.NewReader("Chris wins\n")
-	playerStore := &StubPlayerStore{}
-	cli := &poker.CLI{playerStore, in}
+	t.Run("records Chris wind from user's input", func(t *testing.T) {
+		// arrange
+		in := strings.NewReader("Chris wins\n")
+		playerStore := &StubPlayerStore{}
+		cli := &poker.CLI{playerStore, in}
 
-	// act
-	cli.PlayPoker()
+		// act
+		cli.PlayPoker()
 
-	// assert
-	assertPlayerWin(t, playerStore, "Chris")
+		// assert
+		assertPlayerWin(t, playerStore, "Chris")
+	})
+
+	t.Run("records Cleo wind from user's input", func(t *testing.T) {
+		// arrange
+		in := strings.NewReader("Cleo wins\n")
+		playerStore := &StubPlayerStore{}
+		cli := &poker.CLI{playerStore, in}
+
+		// act
+		cli.PlayPoker()
+
+		// assert
+		assertPlayerWin(t, playerStore, "Cleo")
+	})
 }
 
 func assertPlayerWin(t testing.TB, store *StubPlayerStore, winner string) {
 	t.Helper()
 
 	assert.Equal(t, 1, len(store.winCalls))
-	assert.Equal(t, "Chris", store.winCalls[0])
+	assert.Equal(t, winner, store.winCalls[0])
 }
