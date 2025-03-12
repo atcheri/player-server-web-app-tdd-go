@@ -1,6 +1,7 @@
 package poker_test
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/atcheri/player-server-web-app-tdd-go/internal/domain"
@@ -28,9 +29,15 @@ func (s *StubPlayerStore) GetLeague() domain.League {
 }
 
 func TestCLI(t *testing.T) {
+	// arrange
+	in := strings.NewReader("Chris wins\n")
 	playerStore := &StubPlayerStore{}
-	cli := &poker.CLI{playerStore}
+	cli := &poker.CLI{playerStore, in}
+
+	// act
 	cli.PlayPoker()
 
+	// assert
 	assert.Equal(t, 1, len(playerStore.winCalls))
+	assert.Equal(t, "Chris", playerStore.winCalls[0])
 }
