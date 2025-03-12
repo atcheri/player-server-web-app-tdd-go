@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"sort"
 
@@ -15,11 +16,30 @@ type FileSystemPlayerStore struct {
 	league   domain.League
 }
 
+func LoadFileSystemPlayerStoreFromFile(path string) (*FileSystemPlayerStore, func(), error) {
+	db, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE, 0666)
+	if err != nil {
+		log.Fatalf("problem opening %s %v", path, err)
+	}
+
+	closeFunc := func() {
+		db.Close()
+	}
+
+	store, err := NewFileSystemPlayerStore(db)
+
+	if err != nil {
+		return nil, nil, fmt.Errorf("problem creating file system player store, %v ", err)
+	}
+
+	return store, closeFunc, nil
+}
+
 func NewFileSystemPlayerStore(database *os.File) (*FileSystemPlayerStore, error) {
 	err := initialisePlayerDBFile(database)
 
 	if err != nil {
-		return nil, fmt.Errorf("problem initialising player db file, %v", err)
+		return nil, fmt.Errorf("problem initializing player db file, %v", err)
 	}
 
 	league, err := domain.NewLeague(database)
