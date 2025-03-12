@@ -1,7 +1,9 @@
 package poker
 
 import (
+	"bufio"
 	"io"
+	"strings"
 
 	"github.com/atcheri/player-server-web-app-tdd-go/internal/domain"
 )
@@ -12,5 +14,12 @@ type CLI struct {
 }
 
 func (cli *CLI) PlayPoker() {
-	cli.PlayerStore.RecordWin("Chris")
+	reader := bufio.NewScanner(cli.In)
+	reader.Scan()
+
+	cli.PlayerStore.RecordWin(extractWinner(reader.Text()))
+}
+
+func extractWinner(input string) string {
+	return strings.Replace(input, " wins", "", 1)
 }
