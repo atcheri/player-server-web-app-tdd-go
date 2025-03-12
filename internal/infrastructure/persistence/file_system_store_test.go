@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/atcheri/player-server-web-app-tdd-go/internal/domain/player"
+	"github.com/atcheri/player-server-web-app-tdd-go/internal/domain/league"
 	"github.com/stretchr/testify/assert"
 
 	filestore "github.com/atcheri/player-server-web-app-tdd-go/internal/infrastructure/persistence"
@@ -19,7 +19,7 @@ func TestFileSystemStore(t *testing.T) {
 			{"Name": "Chris", "Wins": 33}]`,
 		)
 		defer cleanDatabase()
-		expectedLeague := []player.Player{
+		expectedLeague := league.League{
 			{Name: "Cleo", Wins: 10},
 			{Name: "Chris", Wins: 33},
 		}

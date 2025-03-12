@@ -8,7 +8,9 @@ import (
 	"github.com/atcheri/player-server-web-app-tdd-go/internal/domain/player"
 )
 
-func NewLeague(reader io.Reader) ([]player.Player, error) {
+type League []player.Player
+
+func NewLeague(reader io.Reader) (League, error) {
 	var league []player.Player
 	err := json.NewDecoder(reader).Decode(&league)
 	if err != nil {
@@ -16,4 +18,14 @@ func NewLeague(reader io.Reader) ([]player.Player, error) {
 	}
 
 	return league, err
+}
+
+func (l League) Find(name string) *player.Player {
+	for i, p := range l {
+		if p.Name == name {
+			return &l[i]
+		}
+	}
+
+	return nil
 }
