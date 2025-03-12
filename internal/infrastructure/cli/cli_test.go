@@ -3,6 +3,7 @@ package poker_test
 import (
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/atcheri/player-server-web-app-tdd-go/internal/domain"
 	poker "github.com/atcheri/player-server-web-app-tdd-go/internal/infrastructure/cli"
@@ -26,6 +27,20 @@ func (s *StubPlayerStore) RecordWin(name string) {
 
 func (s *StubPlayerStore) GetLeague() domain.League {
 	return s.league
+}
+
+type SpyBlindAlerter struct {
+	alerts []struct {
+		scheduledAt time.Duration
+		amount      int
+	}
+}
+
+func (s *SpyBlindAlerter) ScheduleAlertAt(duration time.Duration, amount int) {
+	s.alerts = append(s.alerts, struct {
+		scheduledAt time.Duration
+		amount      int
+	}{duration, amount})
 }
 
 func TestCLI(t *testing.T) {
@@ -53,6 +68,17 @@ func TestCLI(t *testing.T) {
 
 		// assert
 		assertPlayerWin(t, playerStore, "Cleo")
+	})
+
+	t.Run("it schedules printing of blind values", func(t *testing.T) {
+		in := strings.NewReader("Chris wins\n")
+		playerStore := &StubPlayerStore{}
+		blindAlerter := &SpyBlindAlerter{}
+
+		cli := poker.NewCLI(playerStore, in, blindAlerter)
+		cli.PlayPoker()
+
+		assert.Equal(t, 1, len(blindAlerter.alerts))
 	})
 }
 
