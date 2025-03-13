@@ -101,13 +101,11 @@ func TestCLI(t *testing.T) {
 		for i, c := range cases {
 			t.Run(fmt.Sprintf("%d scheduled for %v", c.expectedAmount, c.expectedScheduleTime), func(t *testing.T) {
 				alert := blindAlerter.alerts[i]
-				assert.LessOrEqual(t, 1, len(blindAlerter.alerts))
+				assert.LessOrEqual(t, i, len(blindAlerter.alerts))
 				assert.Equal(t, c.expectedAmount, alert.amount)
 				assert.Equal(t, alert.scheduledAt, c.expectedScheduleTime)
 			})
 		}
-
-		assert.Equal(t, 1, len(blindAlerter.alerts), "expected a blind alert to be scheduled")
 	})
 }
 
