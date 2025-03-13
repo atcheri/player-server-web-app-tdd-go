@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/atcheri/player-server-web-app-tdd-go/internal/domain"
 	poker "github.com/atcheri/player-server-web-app-tdd-go/internal/infrastructure/cli"
 	"github.com/atcheri/player-server-web-app-tdd-go/internal/infrastructure/persistence"
 )
@@ -23,6 +24,6 @@ func main() {
 
 	defer close()
 
-	game := poker.NewCLI(store, os.Stdin)
+	game := poker.NewCLI(store, os.Stdin, domain.BlindAlerterFunc(domain.StdOutAlerter))
 	game.PlayPoker()
 }
