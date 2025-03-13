@@ -1,6 +1,7 @@
 package poker_test
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 	"time"
@@ -79,6 +80,32 @@ func TestCLI(t *testing.T) {
 
 		cli := poker.NewCLI(playerStore, in, blindAlerter)
 		cli.PlayPoker()
+
+		cases := []struct {
+			expectedScheduleTime time.Duration
+			expectedAmount       int
+		}{
+			{0 * time.Second, 100},
+			{10 * time.Minute, 200},
+			{20 * time.Minute, 300},
+			{30 * time.Minute, 400},
+			{40 * time.Minute, 500},
+			{50 * time.Minute, 600},
+			{60 * time.Minute, 800},
+			{70 * time.Minute, 1000},
+			{80 * time.Minute, 2000},
+			{90 * time.Minute, 4000},
+			{100 * time.Minute, 8000},
+		}
+
+		for i, c := range cases {
+			t.Run(fmt.Sprintf("%d scheduled for %v", c.expectedAmount, c.expectedScheduleTime), func(t *testing.T) {
+				alert := blindAlerter.alerts[i]
+				assert.LessOrEqual(t, 1, len(blindAlerter.alerts))
+				assert.Equal(t, c.expectedAmount, alert.amount)
+				assert.Equal(t, alert.scheduledAt, c.expectedScheduleTime)
+			})
+		}
 
 		assert.Equal(t, 1, len(blindAlerter.alerts), "expected a blind alert to be scheduled")
 	})
