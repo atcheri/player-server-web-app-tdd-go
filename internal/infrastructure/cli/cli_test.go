@@ -123,7 +123,7 @@ func TestCLI(t *testing.T) {
 		cli.PlayPoker()
 
 		// assert
-		assert.Equal(t, "Please enter the number of players: ", stdout.String())
+		assert.Equal(t, poker.PlayerPrompt, stdout.String())
 	})
 }
 

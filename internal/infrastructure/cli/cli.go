@@ -10,6 +10,8 @@ import (
 	"github.com/atcheri/player-server-web-app-tdd-go/internal/domain"
 )
 
+const PlayerPrompt = "Please enter the number of players: "
+
 type CLI struct {
 	playerStore domain.PlayerStore
 	in          *bufio.Scanner
@@ -27,7 +29,7 @@ func NewCLI(store domain.PlayerStore, in io.Reader, out io.Writer, alerter domai
 }
 
 func (cli *CLI) PlayPoker() {
-	fmt.Fprint(cli.out, "Please enter the number of players: ")
+	fmt.Fprint(cli.out, PlayerPrompt)
 	cli.scheduleBlindAlerts()
 	input := cli.readLine()
 	cli.playerStore.RecordWin(extractWinner(input))
