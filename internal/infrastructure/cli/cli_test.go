@@ -125,6 +125,38 @@ func TestCLI(t *testing.T) {
 		// assert
 		assert.Equal(t, poker.PlayerPrompt, stdout.String())
 	})
+
+	t.Run("it prompts the user to enter the number of players", func(t *testing.T) {
+		stdout := &bytes.Buffer{}
+		in := strings.NewReader("7\n")
+		blindAlerter := &SpyBlindAlerter{}
+
+		cli := poker.NewCLI(dummyPlayerStore, in, stdout, blindAlerter)
+		cli.PlayPoker()
+
+		got := stdout.String()
+		want := poker.PlayerPrompt
+
+		if got != want {
+			t.Errorf("got %q, want %q", got, want)
+		}
+
+		cases := []scheduledAlert{
+			{0 * time.Second, 100},
+			{12 * time.Minute, 200},
+			{24 * time.Minute, 300},
+			{36 * time.Minute, 400},
+		}
+
+		for i, c := range cases {
+			t.Run(fmt.Sprint(c), func(t *testing.T) {
+				alert := blindAlerter.alerts[i]
+				assert.LessOrEqual(t, i, len(blindAlerter.alerts))
+				assert.Equal(t, c.amount, alert.amount)
+				assert.Equal(t, alert.at, c.at, fmt.Sprintf("alert %d was not scheduled %v", i, blindAlerter.alerts))
+			})
+		}
+	})
 }
 
 func assertPlayerWin(t testing.TB, store *StubPlayerStore, winner string) {
