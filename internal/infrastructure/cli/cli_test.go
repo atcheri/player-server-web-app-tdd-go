@@ -1,6 +1,7 @@
 package poker_test
 
 import (
+	"bytes"
 	"fmt"
 	"strings"
 	"testing"
@@ -30,8 +31,6 @@ func (s *StubPlayerStore) GetLeague() domain.League {
 	return s.league
 }
 
-var dummySpyAlerter = &SpyBlindAlerter{}
-
 type scheduledAlert struct {
 	at     time.Duration
 	amount int
@@ -48,6 +47,13 @@ type SpyBlindAlerter struct {
 func (s *SpyBlindAlerter) ScheduleAlertAt(duration time.Duration, amount int) {
 	s.alerts = append(s.alerts, scheduledAlert{duration, amount})
 }
+
+var (
+	dummyBlindAlerter = &SpyBlindAlerter{}
+	dummyPlayerStore  = &StubPlayerStore{}
+	dummyStdIn        = &bytes.Buffer{}
+	dummyStdOut       = &bytes.Buffer{}
+)
 
 func TestCLI(t *testing.T) {
 	t.Run("records Chris wind from user's input", func(t *testing.T) {
@@ -105,6 +111,19 @@ func TestCLI(t *testing.T) {
 				assert.Equal(t, c.amount, alert.amount)
 				assert.Equal(t, alert.at, c.at)
 			})
+		}
+	})
+
+	t.Run("it prompts the user to enter the number of players", func(t *testing.T) {
+		stdout := &bytes.Buffer{}
+		cli := poker.NewCLI(dummyPlayerStore, dummyStdIn, stdout, dummyBlindAlerter)
+		cli.PlayPoker()
+
+		got := stdout.String()
+		want := "Please enter the number of players: "
+
+		if got != want {
+			t.Errorf("got %q, want %q", got, want)
 		}
 	})
 }
