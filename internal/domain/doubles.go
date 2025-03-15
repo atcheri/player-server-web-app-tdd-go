@@ -48,3 +48,15 @@ type SpyBlindAlerter struct {
 func (s *SpyBlindAlerter) ScheduleAlertAt(duration time.Duration, amount int) {
 	s.Alerts = append(s.Alerts, ScheduledAlert{duration, amount})
 }
+
+type GameSpy struct {
+	StartCalled bool
+}
+
+func (s *GameSpy) Start(nb int) {
+	s.StartCalled = true
+}
+
+func (s *GameSpy) Finish(w string) {
+
+}

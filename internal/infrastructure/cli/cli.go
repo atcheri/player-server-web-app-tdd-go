@@ -12,24 +12,26 @@ import (
 const PlayerPrompt = "Please enter the number of players: "
 
 type CLI struct {
-	playerStore domain.PlayerStore
-	in          *bufio.Scanner
-	out         io.Writer
-	game        *domain.Game
+	in   *bufio.Scanner
+	out  io.Writer
+	game domain.Game
 }
 
-func NewCLI(store domain.PlayerStore, in io.Reader, out io.Writer, alerter domain.BlindAlerter) *CLI {
+func NewCLI(in io.Reader, out io.Writer, game domain.Game) *CLI {
 	return &CLI{
-		playerStore: store,
-		in:          bufio.NewScanner(in),
-		out:         out,
-		game:        domain.NewGame(alerter, store),
+		in:   bufio.NewScanner(in),
+		out:  out,
+		game: game,
 	}
 }
 
 func (cli *CLI) PlayPoker() {
 	fmt.Fprint(cli.out, PlayerPrompt)
-	players, _ := strconv.Atoi(cli.readLine())
+	players, err := strconv.Atoi(cli.readLine())
+	if err != nil {
+		return
+	}
+
 	cli.game.Start(players)
 	cli.game.Finish(cli.readLine())
 }

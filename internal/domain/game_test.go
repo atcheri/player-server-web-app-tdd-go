@@ -13,7 +13,7 @@ func TestGame_Start(t *testing.T) {
 
 	t.Run("it schedules printing of blind values", func(t *testing.T) {
 		// arrange
-		game := domain.NewGame(domain.DummySpyAlerter, domain.DummyPlayerStore)
+		game := domain.NewTexasHoldem(domain.DummySpyAlerter, domain.DummyPlayerStore)
 
 		// act
 		game.Start(5)
@@ -42,5 +42,18 @@ func TestGame_Start(t *testing.T) {
 			})
 		}
 	})
+}
 
+func TestGame_Finish(t *testing.T) {
+	// arrange
+	store := &domain.StubPlayerStore{}
+	game := domain.NewTexasHoldem(domain.DummySpyAlerter, store)
+	winner := "Ruth"
+
+	// act
+	game.Finish(winner)
+
+	// assert
+	assert.Equal(t, 1, len(store.WinCalls))
+	assert.Equal(t, winner, store.WinCalls[0])
 }
