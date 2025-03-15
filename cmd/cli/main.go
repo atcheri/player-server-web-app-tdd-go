@@ -24,6 +24,6 @@ func main() {
 
 	defer close()
 
-	game := poker.NewCLI(store, os.Stdin, domain.BlindAlerterFunc(domain.StdOutAlerter))
+	game := poker.NewCLI(store, os.Stdin, os.Stdout, domain.BlindAlerterFunc(domain.StdOutAlerter))
 	game.PlayPoker()
 }
