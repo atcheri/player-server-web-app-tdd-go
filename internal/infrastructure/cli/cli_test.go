@@ -13,32 +13,34 @@ import (
 )
 
 func TestCLI(t *testing.T) {
-	t.Run("records Chris wind from user's input", func(t *testing.T) {
+	t.Run("start game with 3 players and finish game with 'Chris' as winner", func(t *testing.T) {
 		// arrange
-		in := strings.NewReader("7\nChris wins\n")
-		stubStore := &domain.StubPlayerStore{}
-		game := domain.NewTexasHoldem(domain.DummySpyAlerter, stubStore)
-		cli := poker.NewCLI(in, domain.DummyStdOut, game)
+		in := strings.NewReader("3\nChris wins\n")
+		stdout := &bytes.Buffer{}
+		game := &domain.GameSpy{}
+		cli := poker.NewCLI(in, stdout, game)
 
 		// act
 		cli.PlayPoker()
 
 		// assert
-		assertPlayerWin(t, stubStore, "Chris")
+		assertMessagesSentToUser(t, stdout, poker.PlayerPrompt)
+		assertGameStartedWith(t, game, 3)
+		assertFinishCalledWith(t, game, "Chris")
 	})
 
-	t.Run("records Cleo wins from user's input", func(t *testing.T) {
+	t.Run("start game with 8 players and record 'Cleo' as winner", func(t *testing.T) {
 		// arrange
-		in := strings.NewReader("7\nCleo wins\n")
-		stubStore := &domain.StubPlayerStore{}
-		game := domain.NewTexasHoldem(domain.DummySpyAlerter, stubStore)
+		in := strings.NewReader("8\nCleo wins\n")
+		game := &domain.GameSpy{}
 		cli := poker.NewCLI(in, domain.DummyStdOut, game)
 
 		// act
 		cli.PlayPoker()
 
 		// assert
-		assertPlayerWin(t, stubStore, "Cleo")
+		assertGameStartedWith(t, game, 8)
+		assertFinishCalledWith(t, game, "Cleo")
 	})
 
 	t.Run("it prompts the user to enter the number of players", func(t *testing.T) {
@@ -111,16 +113,36 @@ func TestCLI(t *testing.T) {
 		cli.PlayPoker()
 
 		// assert
-		assert.False(t, game.StartCalled, "game should not have started")
-		assert.Equal(t, poker.PlayerPrompt+poker.BadPlayerInputErrMsg, stdout.String())
+		assertGameNotStarted(t, game)
+		assertMessagesSentToUser(t, stdout, poker.PlayerPrompt, poker.BadPlayerInputErrMsg)
 	})
 }
 
-func assertPlayerWin(t testing.TB, store *domain.StubPlayerStore, winner string) {
+func assertMessagesSentToUser(t testing.TB, stdout *bytes.Buffer, messages ...string) {
 	t.Helper()
+	want := strings.Join(messages, "")
+	got := stdout.String()
+	if got != want {
+		t.Errorf("got %q sent to stdout but expected %+v", got, messages)
+	}
+}
 
-	assert.Equal(t, 1, len(store.WinCalls))
-	assert.Equal(t, winner, store.WinCalls[0])
+func assertGameStartedWith(t *testing.T, game *domain.GameSpy, numberOfPlayers int) {
+	t.Helper()
+	assert.Equal(t, game.NumberOfPlayers, numberOfPlayers)
+	assert.True(t, game.StartCalled)
+}
+
+func assertFinishCalledWith(t *testing.T, game *domain.GameSpy, name string) {
+	t.Helper()
+	assert.True(t, game.FinishCalled)
+	assert.Equal(t, game.Winner, name)
+}
+
+func assertGameNotStarted(t *testing.T, game *domain.GameSpy) {
+	t.Helper()
+	assert.False(t, game.StartCalled)
+	assert.False(t, game.FinishCalled)
 }
 
 func checkSchedulingCases(cases []domain.ScheduledAlert, t *testing.T, blindAlerter *domain.SpyBlindAlerter) {

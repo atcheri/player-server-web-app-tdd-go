@@ -50,13 +50,18 @@ func (s *SpyBlindAlerter) ScheduleAlertAt(duration time.Duration, amount int) {
 }
 
 type GameSpy struct {
-	StartCalled bool
+	StartCalled     bool
+	FinishCalled    bool
+	NumberOfPlayers int
+	Winner          string
 }
 
 func (s *GameSpy) Start(nb int) {
 	s.StartCalled = true
+	s.NumberOfPlayers = nb
 }
 
 func (s *GameSpy) Finish(w string) {
-
+	s.FinishCalled = true
+	s.Winner = extractWinner(w)
 }
