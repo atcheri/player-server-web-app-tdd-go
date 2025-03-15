@@ -12,34 +12,15 @@ import (
 	server "github.com/atcheri/player-server-web-app-tdd-go/internal/infrastructure/http"
 )
 
-type StubPlayerStore struct {
-	scores   map[string]int
-	winCalls []string
-	league   []domain.Player
-}
-
-func (s *StubPlayerStore) GetPlayerScore(name string) int {
-	score := s.scores[name]
-	return score
-}
-
-func (s *StubPlayerStore) RecordWin(name string) {
-	s.winCalls = append(s.winCalls, name)
-}
-
-func (s *StubPlayerStore) GetLeague() domain.League {
-	return s.league
-}
-
 func TestGETPlayer(t *testing.T) {
 	t.Run("returns Pepper's score", func(t *testing.T) {
 		// arrange
-		store := StubPlayerStore{
-			map[string]int{
+		store := domain.StubPlayerStore{
+			Scores: map[string]int{
 				"Pepper": 20,
 				"Floyd":  10,
 			},
-			nil, nil,
+			WinCalls: nil, League: nil,
 		}
 		srv := server.NewPlayerServer(&store)
 		request, _ := http.NewRequest(http.MethodGet, "/players/Pepper", nil)
@@ -58,12 +39,12 @@ func TestGETPlayer(t *testing.T) {
 
 	t.Run("returns Floyd's score", func(t *testing.T) {
 		// arrange
-		store := StubPlayerStore{
-			map[string]int{
+		store := domain.StubPlayerStore{
+			Scores: map[string]int{
 				"Pepper": 20,
 				"Floyd":  10,
 			},
-			nil, nil,
+			WinCalls: nil, League: nil,
 		}
 		srv := server.NewPlayerServer(&store)
 		request, _ := http.NewRequest(http.MethodGet, "/players/Floyd", nil)
@@ -82,12 +63,12 @@ func TestGETPlayer(t *testing.T) {
 
 	t.Run("returns 404 no missing player", func(t *testing.T) {
 		// arrange
-		store := StubPlayerStore{
-			map[string]int{
+		store := domain.StubPlayerStore{
+			Scores: map[string]int{
 				"Pepper": 20,
 				"Floyd":  10,
 			},
-			nil, nil,
+			WinCalls: nil, League: nil,
 		}
 		srv := server.NewPlayerServer(&store)
 		request, _ := http.NewRequest(http.MethodGet, "/players/NoOne", nil)
@@ -105,9 +86,9 @@ func TestGETPlayer(t *testing.T) {
 func TestStorePlayerWins(t *testing.T) {
 	t.Run("records win on POST request", func(*testing.T) {
 		// arrange
-		store := StubPlayerStore{
-			map[string]int{},
-			nil, nil,
+		store := domain.StubPlayerStore{
+			Scores:   map[string]int{},
+			WinCalls: nil, League: nil,
 		}
 		srv := server.NewPlayerServer(&store)
 		request, _ := http.NewRequest(http.MethodPost, "/players/Pepper", nil)
@@ -119,8 +100,8 @@ func TestStorePlayerWins(t *testing.T) {
 
 		// assert
 		assert.Equal(t, http.StatusAccepted, status)
-		assert.Equal(t, 1, len(store.winCalls))
-		assert.Equal(t, "Pepper", store.winCalls[0])
+		assert.Equal(t, 1, len(store.WinCalls))
+		assert.Equal(t, "Pepper", store.WinCalls[0])
 	})
 }
 
@@ -133,7 +114,7 @@ func TestLeague(t *testing.T) {
 			{Name: "Tiest", Wins: 14},
 		}
 
-		store := StubPlayerStore{nil, nil, players}
+		store := domain.StubPlayerStore{Scores: nil, WinCalls: nil, League: players}
 		srv := server.NewPlayerServer(&store)
 		request, _ := http.NewRequest(http.MethodPost, "/league", nil)
 		response := httptest.NewRecorder()
