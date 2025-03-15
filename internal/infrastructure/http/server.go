@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"text/template"
 
 	"github.com/atcheri/player-server-web-app-tdd-go/internal/domain"
 )
@@ -52,6 +53,14 @@ func (p *PlayerServer) handlePlayer(w http.ResponseWriter, r *http.Request) {
 }
 
 func (p *PlayerServer) handleGame(w http.ResponseWriter, r *http.Request) {
+	tmpl, err := template.ParseFiles("./internal/infrastructure/http/game.html")
+
+	if err != nil {
+		http.Error(w, fmt.Sprintf("problem loading template %s", err.Error()), http.StatusInternalServerError)
+		return
+	}
+
+	tmpl.Execute(w, nil)
 	w.WriteHeader(http.StatusOK)
 }
 
