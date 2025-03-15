@@ -137,7 +137,7 @@ func TestGame(t *testing.T) {
 	t.Run("GET /game returns 200", func(t *testing.T) {
 		// arrange
 		server := server.NewPlayerServer(&domain.StubPlayerStore{})
-		request, _ := http.NewRequest(http.MethodGet, "/game", nil)
+		request := newGameRequest()
 		response := httptest.NewRecorder()
 
 		// act
@@ -146,4 +146,9 @@ func TestGame(t *testing.T) {
 		// assert
 		assert.Equal(t, http.StatusOK, response.Code)
 	})
+}
+
+func newGameRequest() *http.Request {
+	request, _ := http.NewRequest(http.MethodGet, "/game", nil)
+	return request
 }
