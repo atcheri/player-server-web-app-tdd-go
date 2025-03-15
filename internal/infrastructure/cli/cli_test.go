@@ -110,9 +110,8 @@ func TestCLI(t *testing.T) {
 		cli.PlayPoker()
 
 		// assert
-		if game.StartCalled {
-			t.Errorf("game should not have started")
-		}
+		assert.False(t, game.StartCalled, "game should not have started")
+		assert.Equal(t, poker.PlayerPrompt+"you're so silly", stdout.String())
 	})
 }
 
