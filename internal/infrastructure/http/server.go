@@ -24,6 +24,7 @@ func NewPlayerServer(store domain.PlayerStore) *PlayerServer {
 	router := http.NewServeMux()
 	router.Handle("/league", http.HandlerFunc(server.handleLeague))
 	router.Handle("/players/", http.HandlerFunc(server.handlePlayer))
+	router.Handle("/game", http.HandlerFunc(server.handleGame))
 	server.Handler = router
 
 	return server
@@ -48,6 +49,10 @@ func (p *PlayerServer) handlePlayer(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		p.showPlayerScore(w, player)
 	}
+}
+
+func (p *PlayerServer) handleGame(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
 }
 
 func (p *PlayerServer) processPlayerWins(w http.ResponseWriter, player string) {
