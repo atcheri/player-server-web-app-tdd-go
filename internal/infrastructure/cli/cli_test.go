@@ -43,9 +43,10 @@ func TestCLI(t *testing.T) {
 
 	t.Run("it prompts the user to enter the number of players", func(t *testing.T) {
 		// arrange
+		in := strings.NewReader("7\n")
 		stdout := &bytes.Buffer{}
 		game := &domain.GameSpy{}
-		cli := poker.NewCLI(domain.DummyStdIn, stdout, game)
+		cli := poker.NewCLI(in, stdout, game)
 
 		// act
 		cli.PlayPoker()
@@ -111,7 +112,7 @@ func TestCLI(t *testing.T) {
 
 		// assert
 		assert.False(t, game.StartCalled, "game should not have started")
-		assert.Equal(t, poker.PlayerPrompt+"you're so silly", stdout.String())
+		assert.Equal(t, poker.PlayerPrompt+poker.BadPlayerInputErrMsg, stdout.String())
 	})
 }
 
