@@ -1,0 +1,46 @@
+package domain_test
+
+import (
+	"fmt"
+	"testing"
+	"time"
+
+	"github.com/atcheri/player-server-web-app-tdd-go/internal/domain"
+	"github.com/stretchr/testify/assert"
+)
+
+func TestGame_Start(t *testing.T) {
+
+	t.Run("it schedules printing of blind values", func(t *testing.T) {
+		// arrange
+		game := domain.NewGame(domain.DummySpyAlerter, domain.DummyPlayerStore)
+
+		// act
+		game.Start(5)
+
+		// assert
+		cases := []domain.ScheduledAlert{
+			{0 * time.Second, 100},
+			{10 * time.Minute, 200},
+			{20 * time.Minute, 300},
+			{30 * time.Minute, 400},
+			{40 * time.Minute, 500},
+			{50 * time.Minute, 600},
+			{60 * time.Minute, 800},
+			{70 * time.Minute, 1000},
+			{80 * time.Minute, 2000},
+			{90 * time.Minute, 4000},
+			{100 * time.Minute, 8000},
+		}
+
+		for i, c := range cases {
+			t.Run(fmt.Sprintf("%d scheduled for %v", c.Amount, c.At), func(t *testing.T) {
+				alert := domain.DummySpyAlerter.Alerts[i]
+				assert.LessOrEqual(t, i, len(domain.DummySpyAlerter.Alerts))
+				assert.Equal(t, c.Amount, alert.Amount)
+				assert.Equal(t, alert.At, c.At)
+			})
+		}
+	})
+
+}

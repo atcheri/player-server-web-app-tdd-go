@@ -19,15 +19,11 @@ type CLI struct {
 }
 
 func NewCLI(store domain.PlayerStore, in io.Reader, out io.Writer, alerter domain.BlindAlerter) *CLI {
-	game := &domain.Game{
-		Alerter: alerter,
-		Store:   store,
-	}
 	return &CLI{
 		playerStore: store,
 		in:          bufio.NewScanner(in),
 		out:         out,
-		game:        game,
+		game:        domain.NewGame(alerter, store),
 	}
 }
 
