@@ -8,6 +8,7 @@ import (
 	"text/template"
 
 	"github.com/atcheri/player-server-web-app-tdd-go/internal/domain"
+	"github.com/gorilla/websocket"
 )
 
 const jsonContentType = "application/json"
@@ -26,6 +27,8 @@ func NewPlayerServer(store domain.PlayerStore) *PlayerServer {
 	router.Handle("/league", http.HandlerFunc(server.handleLeague))
 	router.Handle("/players/", http.HandlerFunc(server.handlePlayer))
 	router.Handle("/game/", http.HandlerFunc(server.handleGame))
+	router.Handle("/ws", http.HandlerFunc(server.handleWebSocket))
+
 	server.Handler = router
 
 	return server
@@ -62,6 +65,16 @@ func (p *PlayerServer) handleGame(w http.ResponseWriter, r *http.Request) {
 
 	tmpl.Execute(w, nil)
 	w.WriteHeader(http.StatusOK)
+}
+
+func (p *PlayerServer) handleWebSocket(w http.ResponseWriter, r *http.Request) {
+	upgrader := websocket.Upgrader{
+		ReadBufferSize:  1024,
+		WriteBufferSize: 1024,
+	}
+	conn, _ := upgrader.Upgrade(w, r, nil)
+	_, winnerMsg, _ := conn.ReadMessage()
+	p.Store.RecordWin(string(winnerMsg))
 }
 
 func (p *PlayerServer) processPlayerWins(w http.ResponseWriter, player string) {

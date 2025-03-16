@@ -2,10 +2,12 @@ package server_test
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/gorilla/websocket"
 	"github.com/stretchr/testify/assert"
@@ -151,6 +153,7 @@ func TestGame(t *testing.T) {
 
 func TestWebSocket(t *testing.T) {
 	t.Run("when we get a message over a websocket it is a winner of a game", func(t *testing.T) {
+		// arrange
 		store := domain.StubPlayerStore{}
 		winner := "Ruth"
 		server := httptest.NewServer(server.NewPlayerServer(&store))
@@ -158,23 +161,24 @@ func TestWebSocket(t *testing.T) {
 
 		wsURL := "ws" + strings.TrimPrefix(server.URL, "http") + "/ws"
 
+		// act
 		ws, _, err := websocket.DefaultDialer.Dial(wsURL, nil)
-		if err != nil {
-			t.Fatalf("could not open a ws connection on %s %v", wsURL, err)
-		}
+		assert.Nil(t, err, fmt.Sprintf("could not open a ws connection on %s %v", wsURL, err))
 		defer ws.Close()
 
+		// assert
 		if err := ws.WriteMessage(websocket.TextMessage, []byte(winner)); err != nil {
 			t.Fatalf("could not send message over ws connection %v", err)
 		}
 
+		time.Sleep(10 * time.Millisecond)
 		AssertPlayerWins(t, store, winner)
 	})
 }
 
 func AssertPlayerWins(t *testing.T, store domain.StubPlayerStore, winner string) {
 	assert.Equal(t, 1, len(store.WinCalls))
-	assert.Equal(t, "Pepper", store.WinCalls[0])
+	assert.Equal(t, winner, store.WinCalls[0])
 }
 
 func newGameRequest() *http.Request {
