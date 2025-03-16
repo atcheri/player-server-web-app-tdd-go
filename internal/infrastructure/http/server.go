@@ -26,7 +26,7 @@ func NewPlayerServer(store domain.PlayerStore) *PlayerServer {
 	router := http.NewServeMux()
 	router.Handle("/league", http.HandlerFunc(server.handleLeague))
 	router.Handle("/players/", http.HandlerFunc(server.handlePlayer))
-	router.Handle("/game/", http.HandlerFunc(server.handleGame))
+	router.Handle("/game", http.HandlerFunc(server.handleGame))
 	router.Handle("/ws", http.HandlerFunc(server.handleWebSocket))
 
 	server.Handler = router
@@ -56,7 +56,7 @@ func (p *PlayerServer) handlePlayer(w http.ResponseWriter, r *http.Request) {
 }
 
 func (p *PlayerServer) handleGame(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.ParseFiles("./internal/infrastructure/http/game.html")
+	tmpl, err := template.ParseFiles("game.html")
 
 	if err != nil {
 		http.Error(w, fmt.Sprintf("problem loading template %s", err.Error()), http.StatusInternalServerError)
