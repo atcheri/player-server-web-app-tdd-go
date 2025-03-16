@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
+	"github.com/gorilla/websocket"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/atcheri/player-server-web-app-tdd-go/internal/domain"
@@ -100,8 +102,7 @@ func TestStorePlayerWins(t *testing.T) {
 
 		// assert
 		assert.Equal(t, http.StatusAccepted, status)
-		assert.Equal(t, 1, len(store.WinCalls))
-		assert.Equal(t, "Pepper", store.WinCalls[0])
+		AssertPlayerWins(t, store, "Pepper")
 	})
 }
 
@@ -146,6 +147,34 @@ func TestGame(t *testing.T) {
 		// assert
 		assert.Equal(t, http.StatusOK, response.Code)
 	})
+}
+
+func TestWebSocket(t *testing.T) {
+	t.Run("when we get a message over a websocket it is a winner of a game", func(t *testing.T) {
+		store := domain.StubPlayerStore{}
+		winner := "Ruth"
+		server := httptest.NewServer(server.NewPlayerServer(&store))
+		defer server.Close()
+
+		wsURL := "ws" + strings.TrimPrefix(server.URL, "http") + "/ws"
+
+		ws, _, err := websocket.DefaultDialer.Dial(wsURL, nil)
+		if err != nil {
+			t.Fatalf("could not open a ws connection on %s %v", wsURL, err)
+		}
+		defer ws.Close()
+
+		if err := ws.WriteMessage(websocket.TextMessage, []byte(winner)); err != nil {
+			t.Fatalf("could not send message over ws connection %v", err)
+		}
+
+		AssertPlayerWins(t, store, winner)
+	})
+}
+
+func AssertPlayerWins(t *testing.T, store domain.StubPlayerStore, winner string) {
+	assert.Equal(t, 1, len(store.WinCalls))
+	assert.Equal(t, "Pepper", store.WinCalls[0])
 }
 
 func newGameRequest() *http.Request {

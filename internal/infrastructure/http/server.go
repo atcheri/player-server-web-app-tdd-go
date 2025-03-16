@@ -25,7 +25,7 @@ func NewPlayerServer(store domain.PlayerStore) *PlayerServer {
 	router := http.NewServeMux()
 	router.Handle("/league", http.HandlerFunc(server.handleLeague))
 	router.Handle("/players/", http.HandlerFunc(server.handlePlayer))
-	router.Handle("/game", http.HandlerFunc(server.handleGame))
+	router.Handle("/game/", http.HandlerFunc(server.handleGame))
 	server.Handler = router
 
 	return server
