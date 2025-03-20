@@ -19,7 +19,7 @@ func TestRecordWinsAndRetrievePlayerScore(t *testing.T) {
 		database, cleanDatabase := createTempFile(t, "")
 		defer cleanDatabase()
 		store, _ := persistence.NewFileSystemPlayerStore(database)
-		server := server.NewPlayerServer(store)
+		server, _ := server.NewPlayerServer(store)
 
 		// act
 		postRequest, _ := http.NewRequest(http.MethodPost, "/players/Pepper", nil)
@@ -42,7 +42,7 @@ func TestRecordWinsAndRetrievePlayerScore(t *testing.T) {
 		database, cleanDatabase := createTempFile(t, "")
 		defer cleanDatabase()
 		store, _ := persistence.NewFileSystemPlayerStore(database)
-		server := server.NewPlayerServer(store)
+		server, _ := server.NewPlayerServer(store)
 		postRequest, _ := http.NewRequest(http.MethodPost, "/players/Pepper", nil)
 		server.ServeHTTP(httptest.NewRecorder(), postRequest)
 		server.ServeHTTP(httptest.NewRecorder(), postRequest)

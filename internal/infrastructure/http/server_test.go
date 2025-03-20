@@ -26,7 +26,7 @@ func TestGETPlayer(t *testing.T) {
 			},
 			WinCalls: nil, League: nil,
 		}
-		srv := server.NewPlayerServer(&store)
+		srv, _ := server.NewPlayerServer(&store)
 		request, _ := http.NewRequest(http.MethodGet, "/players/Pepper", nil)
 		response := httptest.NewRecorder()
 
@@ -50,7 +50,7 @@ func TestGETPlayer(t *testing.T) {
 			},
 			WinCalls: nil, League: nil,
 		}
-		srv := server.NewPlayerServer(&store)
+		srv := mustMakePlayerServer(t, &store)
 		request, _ := http.NewRequest(http.MethodGet, "/players/Floyd", nil)
 		response := httptest.NewRecorder()
 
@@ -74,7 +74,7 @@ func TestGETPlayer(t *testing.T) {
 			},
 			WinCalls: nil, League: nil,
 		}
-		srv := server.NewPlayerServer(&store)
+		srv, _ := server.NewPlayerServer(&store)
 		request, _ := http.NewRequest(http.MethodGet, "/players/NoOne", nil)
 		response := httptest.NewRecorder()
 
@@ -94,7 +94,7 @@ func TestStorePlayerWins(t *testing.T) {
 			Scores:   map[string]int{},
 			WinCalls: nil, League: nil,
 		}
-		srv := server.NewPlayerServer(&store)
+		srv := mustMakePlayerServer(t, &store)
 		request, _ := http.NewRequest(http.MethodPost, "/players/Pepper", nil)
 		response := httptest.NewRecorder()
 
@@ -118,7 +118,7 @@ func TestLeague(t *testing.T) {
 		}
 
 		store := domain.StubPlayerStore{Scores: nil, WinCalls: nil, League: players}
-		srv := server.NewPlayerServer(&store)
+		srv := mustMakePlayerServer(t, &store)
 		request, _ := http.NewRequest(http.MethodPost, "/league", nil)
 		response := httptest.NewRecorder()
 
@@ -139,7 +139,7 @@ func TestLeague(t *testing.T) {
 func TestGame(t *testing.T) {
 	t.Run("GET /game returns 200", func(t *testing.T) {
 		// arrange
-		server := server.NewPlayerServer(&domain.StubPlayerStore{})
+		server := mustMakePlayerServer(t, &domain.StubPlayerStore{})
 		request := newGameRequest()
 		response := httptest.NewRecorder()
 
@@ -156,10 +156,11 @@ func TestWebSocket(t *testing.T) {
 		// arrange
 		store := domain.StubPlayerStore{}
 		winner := "Ruth"
-		server := httptest.NewServer(server.NewPlayerServer(&store))
-		defer server.Close()
+		srv, _ := server.NewPlayerServer(&store)
+		webSockerServer := httptest.NewServer(srv)
 
-		wsURL := "ws" + strings.TrimPrefix(server.URL, "http") + "/ws"
+		defer webSockerServer.Close()
+		wsURL := "ws" + strings.TrimPrefix(webSockerServer.URL, "http") + "/ws"
 
 		// act
 		ws, _, err := websocket.DefaultDialer.Dial(wsURL, nil)
@@ -184,4 +185,12 @@ func AssertPlayerWins(t *testing.T, store domain.StubPlayerStore, winner string)
 func newGameRequest() *http.Request {
 	request, _ := http.NewRequest(http.MethodGet, "/game", nil)
 	return request
+}
+
+func mustMakePlayerServer(t *testing.T, store domain.PlayerStore) *server.PlayerServer {
+	server, err := server.NewPlayerServer(store)
+	if err != nil {
+		t.Fatal("problem creating player server", err)
+	}
+	return server
 }
