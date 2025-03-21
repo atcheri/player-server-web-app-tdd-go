@@ -34,7 +34,7 @@ func (cli *CLI) PlayPoker() {
 		return
 	}
 
-	cli.game.Start(players)
+	cli.game.Start(players, io.Discard)
 	cli.game.Finish(cli.readLine())
 }
 

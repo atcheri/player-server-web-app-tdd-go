@@ -3,6 +3,7 @@ package poker_test
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"strings"
 	"testing"
 	"time"
@@ -63,7 +64,7 @@ func TestCLI(t *testing.T) {
 		game := domain.NewTexasHoldem(blindAlerter, domain.DummyPlayerStore)
 
 		// act
-		game.Start(5)
+		game.Start(5, io.Discard)
 
 		cases := []domain.ScheduledAlert{
 			{At: 0 * time.Second, Amount: 100},
@@ -89,7 +90,7 @@ func TestCLI(t *testing.T) {
 		game := domain.NewTexasHoldem(blindAlerter, domain.DummyPlayerStore)
 
 		// act
-		game.Start(7)
+		game.Start(7, io.Discard)
 
 		cases := []domain.ScheduledAlert{
 			{At: 0 * time.Second, Amount: 100},

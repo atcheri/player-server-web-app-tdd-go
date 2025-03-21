@@ -3,6 +3,7 @@ package domain
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"time"
 )
 
@@ -45,7 +46,7 @@ type SpyBlindAlerter struct {
 	Alerts []ScheduledAlert
 }
 
-func (s *SpyBlindAlerter) ScheduleAlertAt(duration time.Duration, amount int) {
+func (s *SpyBlindAlerter) ScheduleAlertAt(duration time.Duration, amount int, to io.Writer) {
 	s.Alerts = append(s.Alerts, ScheduledAlert{duration, amount})
 }
 
@@ -56,7 +57,7 @@ type GameSpy struct {
 	Winner          string
 }
 
-func (s *GameSpy) Start(nb int) {
+func (s *GameSpy) Start(nb int, to io.Writer) {
 	s.StartCalled = true
 	s.NumberOfPlayers = nb
 }

@@ -2,6 +2,7 @@ package domain_test
 
 import (
 	"fmt"
+	"io"
 	"testing"
 	"time"
 
@@ -16,7 +17,7 @@ func TestGame_Start(t *testing.T) {
 		game := domain.NewTexasHoldem(domain.DummySpyAlerter, domain.DummyPlayerStore)
 
 		// act
-		game.Start(5)
+		game.Start(5, io.Discard)
 
 		// assert
 		cases := []domain.ScheduledAlert{

@@ -1,12 +1,13 @@
 package domain
 
 import (
+	"io"
 	"strings"
 	"time"
 )
 
 type Game interface {
-	Start(numberOfPlayers int)
+	Start(numberOfPlayers int, alertDestination io.Writer)
 	Finish(winner string)
 }
 
@@ -22,12 +23,12 @@ func NewTexasHoldem(alerter BlindAlerter, store PlayerStore) *TexasHoldem {
 	}
 }
 
-func (p *TexasHoldem) Start(numberOfPlayers int) {
+func (p *TexasHoldem) Start(numberOfPlayers int, alertDestination io.Writer) {
 	blindIncrement := time.Duration(5+numberOfPlayers) * time.Minute
 	blinds := []int{100, 200, 300, 400, 500, 600, 800, 1000, 2000, 4000, 8000}
 	blindTime := 0 * time.Second
 	for _, blind := range blinds {
-		p.Alerter.ScheduleAlertAt(blindTime, blind)
+		p.Alerter.ScheduleAlertAt(blindTime, blind, alertDestination)
 		blindTime = blindTime + blindIncrement
 	}
 }
