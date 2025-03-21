@@ -2,7 +2,6 @@ package server_test
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -161,17 +160,11 @@ func TestWebSocket(t *testing.T) {
 
 		defer webSockerServer.Close()
 		wsURL := "ws" + strings.TrimPrefix(webSockerServer.URL, "http") + "/ws"
-
-		// act
-		ws, _, err := websocket.DefaultDialer.Dial(wsURL, nil)
-		assert.Nil(t, err, fmt.Sprintf("could not open a ws connection on %s %v", wsURL, err))
+		ws := mustDialWS(t, wsURL)
 		defer ws.Close()
 
-		// assert
-		if err := ws.WriteMessage(websocket.TextMessage, []byte(winner)); err != nil {
-			t.Fatalf("could not send message over ws connection %v", err)
-		}
-
+		// act and assert
+		writeWSMessage(t, ws, winner)
 		time.Sleep(10 * time.Millisecond)
 		AssertPlayerWins(t, store, winner)
 	})
@@ -189,8 +182,21 @@ func newGameRequest() *http.Request {
 
 func mustMakePlayerServer(t *testing.T, store domain.PlayerStore) *server.PlayerServer {
 	server, err := server.NewPlayerServer(store)
-	if err != nil {
-		t.Fatal("problem creating player server", err)
-	}
+	assert.Nil(t, err, "problem creating player server")
+
 	return server
+}
+
+func mustDialWS(t *testing.T, url string) *websocket.Conn {
+	ws, _, err := websocket.DefaultDialer.Dial(url, nil)
+	assert.Nil(t, err, "could not open a ws connection on %s %v")
+
+	return ws
+}
+
+func writeWSMessage(t testing.TB, conn *websocket.Conn, message string) {
+	t.Helper()
+	if err := conn.WriteMessage(websocket.TextMessage, []byte(message)); err != nil {
+		t.Fatalf("could not send message over ws connection %v", err)
+	}
 }
