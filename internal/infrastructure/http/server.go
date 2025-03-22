@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -17,11 +18,15 @@ const jsonContentType = "application/json"
 const htmlTemplatePath = "game.html"
 
 var (
-	upgrader = websocket.Upgrader{
+	wsUpgrader = websocket.Upgrader{
 		ReadBufferSize:  1024,
 		WriteBufferSize: 1024,
 	}
 )
+
+type playerServerWS struct {
+	*websocket.Conn
+}
 
 type PlayerServer struct {
 	Store domain.PlayerStore
@@ -81,14 +86,14 @@ func (p *PlayerServer) handleGame(w http.ResponseWriter, r *http.Request) {
 }
 
 func (p *PlayerServer) handleWebSocket(w http.ResponseWriter, r *http.Request) {
-	conn, _ := upgrader.Upgrade(w, r, nil)
+	ws := newPlayerServerWS(w, r)
 
-	_, numberOfPlayersMsg, _ := conn.ReadMessage()
+	_, numberOfPlayersMsg, _ := ws.ReadMessage()
 	numberOfPlayers, _ := strconv.Atoi(string(numberOfPlayersMsg))
 	p.Game.Start(numberOfPlayers, io.Discard) //todo: Don't discard the blinds messages!
 
-	_, winnerMsg, _ := conn.ReadMessage()
-	p.Game.Finish(string(winnerMsg))
+	winner := ws.WaitForMsg()
+	p.Game.Finish(string(winner))
 }
 
 func (p *PlayerServer) processPlayerWins(w http.ResponseWriter, player string) {
@@ -104,4 +109,22 @@ func (p *PlayerServer) showPlayerScore(w http.ResponseWriter, player string) {
 	}
 
 	fmt.Fprint(w, score)
+}
+
+func newPlayerServerWS(w http.ResponseWriter, r *http.Request) *playerServerWS {
+	conn, err := wsUpgrader.Upgrade(w, r, nil)
+
+	if err != nil {
+		log.Printf("problem upgrading connection to WebSockets %v\n", err)
+	}
+
+	return &playerServerWS{conn}
+}
+
+func (w *playerServerWS) WaitForMsg() string {
+	_, msg, err := w.ReadMessage()
+	if err != nil {
+		log.Printf("error reading from websocket %v\n", err)
+	}
+	return string(msg)
 }

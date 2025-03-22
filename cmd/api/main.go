@@ -20,7 +20,9 @@ func main() {
 
 	defer close()
 
-	server, err := server.NewPlayerServer(store, &domain.GameSpy{})
+	game := domain.NewTexasHoldem(domain.BlindAlerterFunc(domain.Alerter), store)
+
+	server, err := server.NewPlayerServer(store, game)
 	if err != nil {
 		log.Fatal("problem creating player server", err)
 	}
