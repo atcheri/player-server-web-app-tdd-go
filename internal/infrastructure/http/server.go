@@ -3,7 +3,9 @@ package server
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
+	"strconv"
 	"strings"
 	"text/template"
 
@@ -25,9 +27,10 @@ type PlayerServer struct {
 	Store domain.PlayerStore
 	http.Handler
 	template *template.Template
+	Game     domain.Game
 }
 
-func NewPlayerServer(store domain.PlayerStore) (*PlayerServer, error) {
+func NewPlayerServer(store domain.PlayerStore, game domain.Game) (*PlayerServer, error) {
 	server := new(PlayerServer)
 
 	tmpl, err := template.ParseFiles(htmlTemplatePath)
@@ -38,6 +41,7 @@ func NewPlayerServer(store domain.PlayerStore) (*PlayerServer, error) {
 
 	server.template = tmpl
 	server.Store = store
+	server.Game = game
 
 	router := http.NewServeMux()
 	router.Handle("/league", http.HandlerFunc(server.handleLeague))
@@ -78,8 +82,13 @@ func (p *PlayerServer) handleGame(w http.ResponseWriter, r *http.Request) {
 
 func (p *PlayerServer) handleWebSocket(w http.ResponseWriter, r *http.Request) {
 	conn, _ := upgrader.Upgrade(w, r, nil)
+
+	_, numberOfPlayersMsg, _ := conn.ReadMessage()
+	numberOfPlayers, _ := strconv.Atoi(string(numberOfPlayersMsg))
+	p.Game.Start(numberOfPlayers, io.Discard) //todo: Don't discard the blinds messages!
+
 	_, winnerMsg, _ := conn.ReadMessage()
-	p.Store.RecordWin(string(winnerMsg))
+	p.Game.Finish(string(winnerMsg))
 }
 
 func (p *PlayerServer) processPlayerWins(w http.ResponseWriter, player string) {

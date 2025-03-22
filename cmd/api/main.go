@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/atcheri/player-server-web-app-tdd-go/internal/domain"
 	server "github.com/atcheri/player-server-web-app-tdd-go/internal/infrastructure/http"
 	"github.com/atcheri/player-server-web-app-tdd-go/internal/infrastructure/persistence"
 )
@@ -19,7 +20,7 @@ func main() {
 
 	defer close()
 
-	server, err := server.NewPlayerServer(store)
+	server, err := server.NewPlayerServer(store, &domain.GameSpy{})
 	if err != nil {
 		log.Fatal("problem creating player server", err)
 	}
