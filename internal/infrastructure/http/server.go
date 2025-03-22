@@ -3,7 +3,6 @@ package server
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"strconv"
@@ -26,6 +25,16 @@ var (
 
 type playerServerWS struct {
 	*websocket.Conn
+}
+
+func (w *playerServerWS) Write(p []byte) (n int, err error) {
+	err = w.WriteMessage(websocket.TextMessage, p)
+
+	if err != nil {
+		return 0, err
+	}
+
+	return len(p), nil
 }
 
 type PlayerServer struct {
@@ -90,7 +99,7 @@ func (p *PlayerServer) handleWebSocket(w http.ResponseWriter, r *http.Request) {
 
 	_, numberOfPlayersMsg, _ := ws.ReadMessage()
 	numberOfPlayers, _ := strconv.Atoi(string(numberOfPlayersMsg))
-	p.Game.Start(numberOfPlayers, io.Discard) //todo: Don't discard the blinds messages!
+	p.Game.Start(numberOfPlayers, ws)
 
 	winner := ws.WaitForMsg()
 	p.Game.Finish(string(winner))
