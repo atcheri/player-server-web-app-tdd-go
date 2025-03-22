@@ -97,7 +97,7 @@ func (p *PlayerServer) handleGame(w http.ResponseWriter, r *http.Request) {
 func (p *PlayerServer) handleWebSocket(w http.ResponseWriter, r *http.Request) {
 	ws := newPlayerServerWS(w, r)
 
-	_, numberOfPlayersMsg, _ := ws.ReadMessage()
+	numberOfPlayersMsg := ws.WaitForMsg()
 	numberOfPlayers, _ := strconv.Atoi(string(numberOfPlayersMsg))
 	p.Game.Start(numberOfPlayers, ws)
 
