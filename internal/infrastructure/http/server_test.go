@@ -152,6 +152,7 @@ func TestGame(t *testing.T) {
 
 func TestWebSocket(t *testing.T) {
 	t.Run("start a game with 3 players and declare Ruth the winner", func(t *testing.T) {
+		// arrange
 		timeout := 10 * time.Millisecond
 		expectedAlert := "Blind is 100"
 		game := &domain.GameSpy{BlindAlert: []byte(expectedAlert)}
@@ -162,10 +163,11 @@ func TestWebSocket(t *testing.T) {
 		defer server.Close()
 		defer ws.Close()
 
+		// act
 		writeWSMessage(t, ws, "3")
 		writeWSMessage(t, ws, winner)
 
-		time.Sleep(timeout)
+		// assert
 		assertGameStartedWith(t, game, 3)
 		assertFinishCalledWith(t, game, winner)
 		within(t, timeout, func() { assertWebsocketGotMsg(t, ws, expectedAlert) })
@@ -205,14 +207,25 @@ func writeWSMessage(t testing.TB, conn *websocket.Conn, message string) {
 
 func assertGameStartedWith(t *testing.T, game *domain.GameSpy, numberOfPlayers int) {
 	t.Helper()
-	assert.Equal(t, game.NumberOfPlayers, numberOfPlayers)
-	assert.True(t, game.StartCalled)
+
+	passed := retryUntil(500*time.Millisecond, func() bool {
+		return game.NumberOfPlayers == numberOfPlayers
+	})
+
+	if !passed {
+		t.Errorf("expected finish called with %q but got %q", numberOfPlayers, game.NumberOfPlayers)
+	}
 }
 
-func assertFinishCalledWith(t *testing.T, game *domain.GameSpy, name string) {
+func assertFinishCalledWith(t *testing.T, game *domain.GameSpy, winner string) {
 	t.Helper()
-	assert.True(t, game.FinishCalled)
-	assert.Equal(t, game.Winner, name)
+	passed := retryUntil(500*time.Millisecond, func() bool {
+		return game.Winner == winner
+	})
+
+	if !passed {
+		t.Errorf("expected finish called with %q but got %q", winner, game.Winner)
+	}
 }
 
 func assertWebsocketGotMsg(t *testing.T, ws *websocket.Conn, expectedAlert string) {
@@ -235,4 +248,14 @@ func within(t testing.TB, d time.Duration, assert func()) {
 		t.Error("timed out")
 	case <-done:
 	}
+}
+
+func retryUntil(d time.Duration, f func() bool) bool {
+	deadline := time.Now().Add(d)
+	for time.Now().Before(deadline) {
+		if f() {
+			return true
+		}
+	}
+	return false
 }
